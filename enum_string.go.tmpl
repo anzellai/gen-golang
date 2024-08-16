@@ -9,8 +9,8 @@
     {{- end }}
 
     const (
-    {{- range $fields}}
-        {{$name}}_{{.Name}} {{$name}} = "{{.Name}}"
+    {{- range $i, $field := $fields}}
+        {{$name}}_{{$field.Name}} {{$name}} = "{{if eq (printf `%v` $i) (printf `%v` $field.Value)}}{{$field.Name}}{{else}}{{$field.Value}}{{end}}"
     {{- end}}
     )
 
