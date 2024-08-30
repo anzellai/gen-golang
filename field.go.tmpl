@@ -14,6 +14,11 @@
 {{- $customType := "" -}}
 {{- $jsonTag := printf "json:%q" $name }}
 {{- $structTags := array -}}
+{{- if $optional -}}
+{{- $jsonTag = printf `json:"%v,omitempty"` $name -}}
+{{- else -}}
+{{- $structTags = append $structTags `validate:"required"` -}}
+{{- end -}}
 {{- range $meta := $typeMeta -}}
     {{- if exists $meta "json" -}}
         {{- $jsonTag = printf "json:%q" (get $meta "json") -}}

@@ -20,28 +20,36 @@ const (
 {{- end}}
 )
 
-var {{$name}}_name = map[{{$type}}]string{
+var EnumFrom{{$name}} = map[{{$name}}]string{
 {{- range $fields}}
 	{{.Value}}: "{{.Name}}",
 {{- end}}
 }
 
-var {{$name}}_value = map[string]{{$type}}{
+var EnumTo{{$name}} = map[string]{{$name}}{
 {{- range $fields}}
 	"{{.Name}}": {{.Value}},
 {{- end}}
 }
 
 func (x {{$name}}) String() string {
-	return {{$name}}_name[{{$type}}(x)]
+	return EnumFrom{{$name}}[{{$name}}(x)]
 }
 
 func (x {{$name}}) MarshalText() ([]byte, error) {
-	return []byte({{$name}}_name[{{$type}}(x)]), nil
+	s, ok := EnumFrom{{$name}}[{{$name}}(x)]
+	if !ok {
+		return nil, fmt.Errorf("%v is not a valid {{$name}}", string(x))
+	}
+	return []byte(s), nil
 }
 
 func (x *{{$name}}) UnmarshalText(b []byte) error {
-	*x = {{$name}}({{$name}}_value[string(b)])
+	var ok bool
+	*x, ok = EnumTo{{$name}}[string(b)]
+	if !ok {
+		return fmt.Errorf("%v is not a valid {{$name}}", string(b))
+	}
 	return nil
 }
 
