@@ -127,7 +127,8 @@ func (s *{{$serviceName}}) serve{{firstLetterToUpper $method.Name}}JSON(ctx cont
 		s.sendErrorJSON(w, r, ErrWebrpcBadResponse.WithCause(fmt.Errorf("failed to validate response: %w", err)))
 		return
 	}
-	{{- end}}
+
+	{{ end -}}
 
 
 	{{- if $method.Outputs | len}}
