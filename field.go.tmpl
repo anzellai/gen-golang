@@ -16,8 +16,6 @@
 {{- $structTags := array -}}
 {{- if $optional -}}
 {{- $jsonTag = printf `json:"%v,omitempty"` $name -}}
-{{- else -}}
-{{- $structTags = append $structTags `validate:"required"` -}}
 {{- end -}}
 {{- range $meta := $typeMeta -}}
     {{- if exists $meta "json" -}}
@@ -35,9 +33,6 @@
     {{- range $metaKey, $metaValue := $meta -}}
         {{- if and (hasPrefix $metaKey "go.tag.") (ne $metaKey "go.tag.json") -}}
             {{- $structTags = append $structTags (printf "%s:%q" (trimPrefix $metaKey "go.tag.") $metaValue) -}}
-        {{- end -}}
-        {{- if eq $metaKey "pattern" -}}
-            {{- $structTags = append $structTags (printf `validate:"regexp=%v"` $metaValue) -}}
         {{- end -}}
     {{- end -}}
 {{- end }}

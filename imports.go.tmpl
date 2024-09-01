@@ -75,9 +75,6 @@ import (
 	{{- stderrPrintf "unsupported -json=%s" $opts.json -}}
 	{{- exit 1 -}}
 {{- end -}}
-{{- if $opts.server -}}
-	{{- set $imports "github.com/go-playground/validator/v10" "validator" -}}
-{{- end -}}
 
 {{- if ne $opts.importTypesFrom "" }}
 	{{- set $imports $opts.importTypesFrom "" -}}
@@ -110,11 +107,6 @@ import (
 {{- if eq $opts.json "jsoniter" }}
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
-{{- end -}}
-
-{{- if $opts.server }}
-
-var validate = validator.New(validator.WithRequiredStructEnabled())
 {{- end -}}
 
 {{- end -}}
