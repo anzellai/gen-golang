@@ -1,38 +1,58 @@
 {{- define "enum_string" -}}
-    {{- $name := .Name -}}
-    {{- $type := .Type -}}
-    {{- $fields := .Fields -}}
-    {{- $opts := .Opts -}}
+{{- $name := .Name -}}
+{{- $type := .Type -}}
+{{- $fields := .Fields -}}
+{{- $opts := .Opts -}}
 
-    {{- if $opts.types -}}
-        type {{$name}} {{$type}}
-    {{- end }}
+{{- if $opts.types -}}
+    type {{$name}} {{$type}}
+{{- end }}
 
-    const (
-    {{- range $fields}}
-        {{$name}}_{{.Name}} {{$name}} = "{{.Name}}"
-    {{- end}}
-    )
+const (
+{{- range $i, $field := $fields}}
+    {{$name}}_{{$field.Name}} {{$name}} = "{{if eq (printf `%v` $i) (printf `%v` $field.Value)}}{{$field.Name}}{{else}}{{$field.Value}}{{end}}"
+{{- end}}
+)
 
-    func (x {{$name}}) MarshalText() ([]byte, error) {
-    return []byte(x), nil
+var EnumFrom{{$name}} = map[{{$name}}]string{
+{{- range $i, $field := $fields}}
+    {{$name}}_{{$field.Name}}: "{{if eq (printf `%v` $i) (printf `%v` $field.Value)}}{{$field.Name}}{{else}}{{$field.Value}}{{end}}",
+{{- end}}
+}
+
+var EnumTo{{$name}} = map[string]{{$name}}{
+{{- range $i, $field := $fields}}
+    "{{if eq (printf `%v` $i) (printf `%v` $field.Value)}}{{$field.Name}}{{else}}{{$field.Value}}{{end}}": {{$name}}_{{$field.Name}},
+{{- end}}
+}
+
+func (x {{$name}}) MarshalText() ([]byte, error) {
+	s, ok := EnumFrom{{$name}}[x]
+	if !ok {
+		return nil, fmt.Errorf("%v is not a valid {{$name}}", string(x))
+	}
+    return []byte(s), nil
+}
+
+func (x *{{$name}}) UnmarshalText(b []byte) error {
+    var ok bool
+    *x, ok = EnumTo{{$name}}[string(b)]
+    if !ok {
+        return fmt.Errorf("%v is not a valid {{$name}}", string(b))
     }
-
-    func (x *{{$name}}) UnmarshalText(b []byte) error {
-    *x = {{$name}}(string(b))
     return nil
-    }
+}
 
-    func (x *{{$name}}) Is(values ...{{$name}}) bool {
+func (x *{{$name}}) Is(values ...{{$name}}) bool {
     if x == nil {
-    return false
+        return false
     }
     for _, v := range values {
-    if *x == v {
-    return true
-    }
+        if *x == v {
+            return true
+        }
     }
     return false
-    }
+}
 
 {{- end -}}

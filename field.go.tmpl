@@ -14,6 +14,9 @@
 {{- $customType := "" -}}
 {{- $jsonTag := printf "json:%q" $name }}
 {{- $structTags := array -}}
+{{- if $optional -}}
+{{- $jsonTag = printf `json:"%v,omitempty"` $name -}}
+{{- end -}}
 {{- range $meta := $typeMeta -}}
     {{- if exists $meta "json" -}}
         {{- $jsonTag = printf "json:%q" (get $meta "json") -}}
@@ -51,11 +54,7 @@
     {{if $optional}}*{{end}}{{ get $typeMap $type }}
 
 {{- else -}}{{- /* structs */ -}}
-    {{- if isEnumType $type -}}
-        {{if $optional}}*{{end}}{{$typePrefix}}{{$type}}
-    {{- else -}}
-        *{{$typePrefix}}{{$type}}
-    {{- end -}}
+    {{if $optional}}*{{end}}{{$typePrefix}}{{$type}}
 {{- end -}}
 
 {{- if $includeJsonTags -}}
